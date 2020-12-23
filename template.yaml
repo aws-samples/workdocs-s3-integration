@@ -1,0 +1,83 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Parameters:
+  ID:
+    Type: String
+    Default: "d-90677c1311"
+  Query:
+    Type: String
+    Default: "viyoma"
+  S3TriggerBucketName:
+    Description: The name to give the new S3 Landing Bucket for Triggering execution
+    Type: String
+Globals:
+  Function:
+    Environment:
+      Variables:
+        ID: !Ref ID
+        Query: !Ref Query
+Resources:
+  S3TriggerBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref S3TriggerBucketName
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      NotificationConfiguration:
+        LambdaConfigurations:
+          - Event: "s3:ObjectCreated:*"
+            Function: !GetAtt NodeJsFunction.Arn
+  NodeJsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/js/
+      Role: !GetAtt LambdaFunctionExecutionRole.Arn
+      Runtime: nodejs10.x
+      Handler: index.handler
+      Timeout: 5
+      AutoPublishAlias: LIVE
+  S3ToWorkDocsLambdaPermissions:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref NodeJsFunction
+      Principal: s3.amazonaws.com
+      SourceAccount: !Ref "AWS::AccountId"
+      SourceArn: !Sub "arn:aws:s3:::${S3TriggerBucketName}"
+  LambdaFunctionExecutionRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      Path: "/"
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+      Policies:
+        - PolicyName: workdocs1
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: s3:*
+                Resource: "*"
+        - PolicyName: workdocs
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "workdocs:*"
+                  - "ds:DescribeDirectories"
+                  - "ec2:DescribeVpcs"
+                  - "ec2:DescribeSubnets"
+                Resource: "*"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: "AllowLambdaServiceToAssumeRole"
+            Effect: "Allow"
+            Action:
+              - "sts:AssumeRole"
+            Principal:
+              Service:
+                - "lambda.amazonaws.com"

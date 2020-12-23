@@ -1,0 +1,24 @@
+{
+  "name": "sam-workdocs",
+  "version": "1.0.0",
+  "description": "",
+  "main": "test.js",
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "aws-sdk": "^2.733.0",
+    "aws-sdk-mock": "^5.1.0",
+    "axios": "^0.19.2",
+    "chai": "^4.2.0",
+    "form-data": "^3.0.0",
+    "got": "^11.5.2",
+    "jslint": "^0.12.1",
+    "mock-aws-s3": "^4.0.1"
+  },
+  "devDependencies": {
+    "mocha": "^8.2.1"
+  },
+  "scripts": {
+    "test": "mocha"
+  }
+}
