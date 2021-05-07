@@ -34,7 +34,7 @@ Resources:
     Properties:
       CodeUri: src/js/
       Role: !GetAtt LambdaFunctionExecutionRole.Arn
-      Runtime: nodejs10.x
+      Runtime: nodejs14.x
       Handler: index.handler
       Timeout: 5
       AutoPublishAlias: LIVE
