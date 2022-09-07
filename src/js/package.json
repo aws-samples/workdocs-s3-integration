@@ -14,11 +14,6 @@
     "aws-sdk-mock": "^5.1.0",
     "axios": "^0.21.2",
     "form-data": "^3.0.0",
-    "got": "^11.8.5",
-    "jslint": "^0.12.1"
-  },
-  "devDependencies": {
-    "eslint": "^7.8.1",
-    "lint": "^0.7.0"
+    "got": "^11.8.5"
   }
 }
